@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Finaliser ma commande — {{ COMPANY }}{% endblock %}
+{% block content %}
+
+<section class="page">
+  <div class="container">
+    <p class="eyebrow">Vente en gros</p>
+    <h1 class="page-title">Finaliser ma commande</h1>
+    <p class="page-sub">{{ SHIPPING_DELAY }} — le prix par pièce est fixé selon la quantité commandée.</p>
+
+    {% if errors %}
+    <div class="flash flash-error">
+      <strong>Veuillez corriger les éléments suivants :</strong>
+      <ul>
+        {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('checkout_submit') }}" class="checkout-form" id="checkoutForm">
+      <div class="checkout-layout">
+
+        <div class="checkout-main">
+
+          <!-- Coordonnées -->
+          <fieldset class="co-fieldset">
+            <legend><span class="co-num">1</span> Coordonnées</legend>
+            <div class="co-grid">
+              <div class="field">
+                <label for="first_name">Prénom *</label>
+                <input type="text" id="first_name" name="first_name" required
+                       value="{{ form.get('first_name','') if form else '' }}" autocomplete="given-name">
+              </div>
+              <div class="field">
+                <label for="last_name">Nom *</label>
+                <input type="text" id="last_name" name="last_name" required
+                       value="{{ form.get('last_name','') if form else '' }}" autocomplete="family-name">
+              </div>
+              <div class="field">
+                <label for="email">Courriel *</label>
+                <input type="email" id="email" name="email" required
+                       value="{{ form.get('email','') if form else '' }}" autocomplete="email">
+              </div>
+              <div class="field">
+                <label for="phone">Téléphone *</label>
+                <input type="tel" id="phone" name="phone" required
+                       value="{{ form.get('phone','') if form else '' }}" autocomplete="tel"
+                       placeholder="514 555-0199">
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Adresse de livraison -->
+          <fieldset class="co-fieldset">
+            <legend><span class="co-num">2</span> Adresse de livraison</legend>
+            <div class="co-grid">
+              <div class="field field-full">
+                <label for="address">Adresse *</label>
+                <input type="text" id="address" name="address" required
+                       value="{{ form.get('address','') if form else '' }}" autocomplete="street-address"
+                       placeholder="1234, rue de la Montagne">
+              </div>
+              <div class="field">
+                <label for="apartment">Appartement (optionnel)</label>
+                <input type="text" id="apartment" name="apartment"
+                       value="{{ form.get('apartment','') if form else '' }}">
+              </div>
+              <div class="field">
+                <label for="city">Ville *</label>
+                <input type="text" id="city" name="city" required
+                       value="{{ form.get('city','') if form else '' }}" placeholder="Montréal">
+              </div>
+              <div class="field">
+                <label for="province">Province *</label>
+                <select id="province" name="province" required>
+                  {% set pv = form.get('province','Québec') if form else 'Québec' %}
+                  {% for p in ['Québec','Ontario','Nouveau-Brunswick','Nouvelle-Écosse','Île-du-Prince-Édouard','Terre-Neuve-et-Labrador','Manitoba','Saskatchewan','Alberta','Colombie-Britannique'] %}
+                  <option value="{{ p }}" {% if p == pv %}selected{% endif %}>{{ p }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label for="postal_code">Code postal *</label>
+                <input type="text" id="postal_code" name="postal_code" required
+                       value="{{ form.get('postal_code','') if form else '' }}" placeholder="H2X 1Y4">
+              </div>
+            </div>
+            <p class="co-hint">{{ SHIPPING_DELAY }}. Expédition sous 24 h après confirmation.</p>
+          </fieldset>
+
+          <!-- Paiement -->
+          <fieldset class="co-fieldset">
+            <legend><span class="co-num">3</span> Méthode de paiement</legend>
+
+            <div class="pay-options">
+              {% for key, m in payment_methods.items() %}
+              <label class="pay-option">
+                <input type="radio" name="payment_method" value="{{ key }}"
+                       {% if (form and form.get('payment_method') == key) or (not form and key == 'carte') %}checked{% endif %}>
+                <span class="pay-radio"></span>
+                <span class="pay-label">
+                  <strong>{{ m.label }}</strong>
+                  <small>{{ m.sub }}</small>
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+
+            <!-- Carte de crédit -->
+            <div class="pay-panel" id="panel-carte">
+              <div class="co-grid">
+                <div class="field field-full">
+                  <label for="card_name">Titulaire de la carte *</label>
+                  <input type="text" id="card_name" name="card_name"
+                         value="{{ form.get('card_name','') if form else '' }}" autocomplete="cc-name">
+                </div>
+                <div class="field field-full">
+                  <label for="card_number">Numéro de carte *</label>
+                  <input type="text" id="card_number" name="card_number" inputmode="numeric"
+                         autocomplete="cc-number" maxlength="23" placeholder="1234 5678 9012 3456"
+                         value="{{ form.get('card_number','') if form else '' }}">
+                </div>
+                <div class="field">
+                  <label for="card_expiry">Expiration (MM/AA) *</label>
+                  <input type="text" id="card_expiry" name="card_expiry" inputmode="numeric"
+                         autocomplete="cc-exp" maxlength="5" placeholder="12/28"
+                         value="{{ form.get('card_expiry','') if form else '' }}">
+                </div>
+                <div class="field">
+                  <label for="card_cvc">CVC *</label>
+                  <input type="text" id="card_cvc" name="card_cvc" inputmode="numeric"
+                         autocomplete="cc-csc" maxlength="4" placeholder="123"
+                         value="{{ form.get('card_cvc','') if form else '' }}">
+                </div>
+              </div>
+              <p class="co-hint">Aucun montant n'est débité en ligne — paiement à la livraison (terminal portable).</p>
+            </div>
+
+            <!-- Virement bancaire -->
+            <div class="pay-panel" id="panel-virement">
+              <div class="bank-box">
+                <h4>Coordonnées bancaires</h4>
+                <p><strong>Bénéficiaire :</strong> {{ bank_details.beneficiaire }}</p>
+                <p><strong>Banque :</strong> {{ bank_details.banque }}</p>
+                <p><strong>Institution :</strong> {{ bank_details.institution }} ·
+                  <strong>Transit :</strong> {{ bank_details.transit }} ·
+                  <strong>Compte :</strong> {{ bank_details.compte }}</p>
+                <p class="bank-note">Indiquez votre numéro de commande en référence. Votre commande sera expédiée
+                  dès réception du virement (vérification sous 24 h).</p>
+              </div>
+            </div>
+
+            <!-- Espèces -->
+            <div class="pay-panel" id="panel-especes">
+              <div class="bank-box">
+                <h4>Paiement en espèces — à la livraison</h4>
+                <p>Réglez en espèces lors de la livraison. Un conseiller vous contactera pour convenir du moment
+                  de la remise.</p>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Récapitulatif -->
+        <aside class="checkout-summary">
+          <h3>Votre commande</h3>
+          <div class="summary-items">
+            {% for item in items %}
+            <div class="summary-item">
+              <span class="summary-qty">{{ item.qty|intdot }} ×</span>
+              <span class="summary-name">{{ item.name }}<small class="summary-tier">({{ item.price|money }} / pièce)</small></span>
+              <span class="summary-price">{{ item.subtotal|money }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="summary-row"><span>Sous-total</span><span>{{ totals.subtotal|money }}</span></div>
+          <div class="summary-row"><span>Livraison (24 h à 48 h)</span><span><b class="free">Incluse</b></span></div>
+          <div class="summary-row summary-total"><span>Total</span><span>{{ totals.total|money }}</span></div>
+          <button type="submit" class="btn btn-dark btn-block">Confirmer la commande</button>
+          <p class="summary-safe">Paiement sécurisé — carte, virement ou espèces</p>
+          <p class="summary-safe">{{ SHIPPING_DELAY }}</p>
+        </aside>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

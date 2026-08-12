@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ COMPANY }} — {{ TAGLINE }}{% endblock %}</title>
+<meta name="description" content="{{ COMPANY }} — {{ TAGLINE }}. Sacs PP tissés et feuilles PP pour l'emballage de vêtements usagés, en gros dès 2 000 pièces. {{ SHIPPING_DELAY }}.">
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="announce">
+  <div class="container announce-inner">
+    <span>{{ SHIPPING_DELAY }}</span>
+    <span class="announce-dot">·</span>
+    <span>Vente en gros — dès 2 000 pièces</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-top">
+    <a class="logo" href="{{ url_for('index') }}">
+      TERY-EMBALLAGE<span>{{ TAGLINE }}</span>
+    </a>
+    <div class="header-actions">
+      <a class="cart-link" href="{{ url_for('cart_page') }}" aria-label="Voir mon panier">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M6 7h12l1.2 12.2a1.6 1.6 0 0 1-1.6 1.8H6.4a1.6 1.6 0 0 1-1.6-1.8L6 7Z"/>
+          <path d="M9 10V6a3 3 0 0 1 6 0v4"/>
+        </svg>
+        <span class="cart-count">{% if cart_count %}{{ cart_count|intdot }}{% endif %}</span>
+      </a>
+    </div>
+  </div>
+  <div class="header-nav">
+    <div class="container">
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="{{ url_for('index') }}#produits">Produits</a>
+        <a href="{{ url_for('index') }}#paliers">Prix en gros</a>
+        <a href="{{ url_for('index') }}#info">Livraison &amp; Paiement</a>
+        <a href="{{ url_for('index') }}#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container flashes">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">TERY-EMBALLAGE</div>
+      <p class="footer-tagline">{{ TAGLINE }} — sacs et feuilles en polypropylène (PP).</p>
+      <p class="footer-tenue">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M12 3l7 3v5c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        {{ WARRANTY }}
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <p><a href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a></p>
+      <p>{{ SHIPPING_DELAY }}</p>
+    </div>
+    <div class="footer-col">
+      <h4>Paiement</h4>
+      <p>Carte de crédit — terminal portable à la livraison</p>
+      <p>Virement bancaire</p>
+      <p>Espèces — payé à la livraison</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <span>© 2026 {{ COMPANY }} — Tous droits réservés.</span>
+      <a class="admin-link" href="{{ url_for('admin_login') }}">Administration</a>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div>
+      <p class="eyebrow">Emballages PP — vente en gros</p>
+      <h1>{{ TAGLINE }}</h1>
+      <p class="hero-desc">Sacs PP tissés et feuilles pour vêtements usagés. Livraison incluse 24 à 48 h.</p>
+      <div class="hero-badges">
+        <span class="badge"><strong>Dès 2 000 pièces</strong></span>
+        <span class="badge">Livraison incluse 24-48 h</span>
+        <span class="badge">Défectueux échangés</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-dark" href="#produits">Voir les produits</a>
+        <a class="btn btn-ghost" href="#paliers">Prix en gros</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="carousel hero-carousel" data-carousel>
+        <img class="carousel-slide active" src="{{ url_for('static', filename='img/sac-blanc.webp') }}"
+             alt="Sac PP tissé blanc 80 × 125 cm" loading="eager">
+        <img class="carousel-slide" src="{{ url_for('static', filename='img/sac-transparent.webp') }}"
+             alt="Sac PP tissé transparent 80 × 115 cm" loading="eager">
+        <img class="carousel-slide" src="{{ url_for('static', filename='img/feuille-pp-1.jpg') }}"
+             alt="Feuille PP transparente 105 × 135 cm" loading="eager">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS -->
+<section class="products" id="produits">
+  <div class="container">
+    <p class="eyebrow center">Produits</p>
+    <h2 class="center">Nos emballages</h2>
+    <div class="products-grid">
+      {% for key, p in products.items() %}
+      <article class="product-card">
+        <a class="product-card-img" href="{{ url_for('product_page', key=key) }}">
+          <div class="carousel card-carousel" data-carousel>
+            <img class="carousel-slide active" src="{{ url_for('static', filename=p.image) }}" alt="{{ p.name }}" loading="lazy">
+            {% if p.usage %}
+            <img class="carousel-slide" src="{{ url_for('static', filename=p.usage) }}" alt="{{ p.name }} — utilisation" loading="lazy">
+            {% endif %}
+          </div>
+        </a>
+        <div class="product-card-body">
+          <h3><a href="{{ url_for('product_page', key=key) }}">{{ p.name }}</a></h3>
+          <p class="product-card-tag">{{ p.tagline }}</p>
+          <ul class="product-card-specs">
+            {% for label, value in p.specs[:2] %}
+            <li><span>{{ label }}</span> {{ value }}</li>
+            {% endfor %}
+          </ul>
+          <div class="product-card-foot">
+            <span class="product-card-price">dès 0,50 $ / pièce<small>2 000 pièces min.</small></span>
+            <a class="btn btn-dark btn-sm" href="{{ url_for('product_page', key=key) }}">Commander</a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- PALIERS DE PRIX -->
+<section class="pricing" id="paliers">
+  <div class="container">
+    <p class="eyebrow center">Prix en gros</p>
+    <h2 class="center">Prix selon la quantité</h2>
+    <div class="tier-grid">
+      {% for min_qty, price in TIERS_DISPLAY %}
+      <div class="tier-card {% if min_qty == 5000 %}tier-best{% endif %}">
+        {% if min_qty == 5000 %}<span class="tier-flag">Meilleur prix</span>{% endif %}
+        <div class="tier-qty">{{ min_qty|intdot }} <small>pièces et +</small></div>
+        <div class="tier-price">{{ price|money }} <small>par pièce</small></div>
+        {% if min_qty == 2000 %}<p class="tier-note">Quantité minimale de commande</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <p class="pricing-note">10 000 pièces et plus ? <a href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a></p>
+  </div>
+</section>
+
+<!-- LIVRAISON & PAIEMENT -->
+<section class="info" id="info">
+  <div class="container">
+    <p class="eyebrow center">Livraison &amp; Paiement</p>
+    <h2 class="center">Livraison et paiement</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/>
+          <circle cx="7" cy="17.5" r="1.6"/>
+          <circle cx="17" cy="17.5" r="1.6"/>
+        </svg>
+        <h3>Livraison incluse</h3>
+        <p>24 à 48 h, incluse dans le prix.</p>
+      </div>
+      <div class="info-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="3" y="6" width="18" height="12" rx="2"/>
+          <path d="M3 10h18"/>
+        </svg>
+        <h3>Carte de crédit</h3>
+        <p>Terminal portable à la livraison.</p>
+      </div>
+      <div class="info-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M4 10l8-5 8 5"/>
+          <path d="M6 10v8M10 10v8M14 10v8M18 10v8"/>
+          <path d="M3 20h18"/>
+        </svg>
+        <h3>Virement bancaire</h3>
+        <p>Coordonnées à la confirmation.</p>
+      </div>
+      <div class="info-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="3" y="7" width="18" height="12" rx="2"/>
+          <circle cx="12" cy="13" r="2.5"/>
+          <path d="M6 11v.01M18 15v.01"/>
+        </svg>
+        <h3>Espèces</h3>
+        <p>Payé à la livraison.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GARANTIE -->
+<section class="warranty">
+  <div class="container warranty-inner">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+      <path d="M12 3l7 3v5c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6z"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+    <p>{{ WARRANTY }}</p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="cta-band" id="contact">
+  <div class="container">
+    <h2>Commande en gros ?</h2>
+    <p>Écrivez-nous — réponse sous 24 h.</p>
+    <a class="btn" href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a>
+  </div>
+</section>
+
+{% endblock %}

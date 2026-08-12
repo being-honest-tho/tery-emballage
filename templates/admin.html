@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commandes — Administration {{ COMPANY }}</title>
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+
+<header class="admin-head">
+  <div class="container admin-head-inner">
+    <span class="admin-brand">TERY-EMBALLAGE <small>Administration</small></span>
+    <div class="admin-head-actions">
+      <a class="admin-link" href="{{ url_for('index') }}">Boutique</a>
+      <a class="admin-link" href="{{ url_for('admin_logout') }}">Déconnexion</a>
+    </div>
+  </div>
+</header>
+
+<main class="container admin-main">
+  <p class="eyebrow">Administration</p>
+  <h1 class="page-title">Commandes</h1>
+  <p class="page-sub">{{ orders|length }} commande(s)</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if not orders %}
+  <div class="empty-cart">
+    <p>Aucune commande pour le moment.</p>
+  </div>
+  {% else %}
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Réf.</th>
+          <th>Date</th>
+          <th>Client</th>
+          <th>Paiement</th>
+          <th>Total</th>
+          <th>Statut</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td class="admin-ref">{{ o.ref }}</td>
+          <td class="admin-nowrap">{{ o.created_at }}</td>
+          <td>
+            {{ o.first_name }} {{ o.last_name }}<br>
+            <span class="admin-sub">{{ o.email }}</span>
+          </td>
+          <td>{{ payment_methods[o.payment_method].label }}</td>
+          <td class="admin-total">{{ o.total|money }}</td>
+          <td><span class="admin-status">{{ STATUS_SHORT[o.payment_method] }}</span></td>
+          <td><button type="button" class="btn btn-ghost btn-sm admin-detail" data-id="{{ o.id }}">Détails</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</main>
+
+<!-- Détails de commande -->
+<div class="admin-modal" id="adminModal" hidden>
+  <div class="admin-modal-box">
+    <div class="admin-modal-head">
+      <h3 id="mRef"></h3>
+      <button type="button" class="admin-modal-close" id="mClose">Fermer</button>
+    </div>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var ORDERS = {{ orders_json|safe }};
+  var modal = document.getElementById("adminModal");
+  var mRef = document.getElementById("mRef");
+  var mBody = document.getElementById("mBody");
+
+  function money(v) {
+    return v.toLocaleString("fr-CA", { style: "currency", currency: "CAD" });
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  document.querySelectorAll(".admin-detail").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var o = ORDERS.filter(function (x) { return x.id === parseInt(btn.dataset.id, 10); })[0];
+      if (!o) return;
+      mRef.textContent = "Commande " + o.ref;
+      var items = o.items.map(function (i) {
+        return '<div class="admin-item"><span>' + esc(i.qty.toLocaleString("fr-CA")) +
+          " × " + esc(i.product_name) + '</span><span>' + money(i.price * i.qty) + "</span></div>";
+      }).join("");
+      mBody.innerHTML =
+        '<h4>Client</h4>' +
+        '<p>' + esc(o.first_name) + " " + esc(o.last_name) + "</p>" +
+        '<p>' + esc(o.email) + " — " + esc(o.phone) + "</p>" +
+        '<h4>Livraison</h4>' +
+        '<p>' + esc(o.address) + (o.apartment ? ", " + esc(o.apartment) : "") + "</p>" +
+        '<p>' + esc(o.city) + ", " + esc(o.province) + " " + esc(o.postal_code) + "</p>" +
+        '<h4>Articles</h4>' + items +
+        '<div class="admin-total-row"><span>Total</span><span>' + money(o.total) + "</span></div>" +
+        '<h4>Paiement</h4>' +
+        '<p>' + esc(o.payment_method === "carte" ? "Carte de crédit" :
+                    o.payment_method === "virement" ? "Virement bancaire" : "Espèces") +
+        (o.card_last4 ? " — carte se terminant par " + esc(o.card_last4) : "") + "</p>" +
+        '<p class="admin-sub">' + esc(o.status) + "</p>";
+      modal.hidden = false;
+    });
+  });
+
+  document.getElementById("mClose").addEventListener("click", function () {
+    modal.hidden = true;
+  });
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) modal.hidden = true;
+  });
+})();
+</script>
+
+</body>
+</html>

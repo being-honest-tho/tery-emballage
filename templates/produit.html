@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }} — {{ COMPANY }}{% endblock %}
+{% block content %}
+
+<section class="page">
+  <div class="container">
+    <p class="eyebrow"><a class="back-link" href="{{ url_for('index') }}#produits">← Tous les produits</a></p>
+
+    <div class="product-layout">
+      <div class="product-gallery">
+        <div class="gallery-main">
+          <img id="galleryMain" src="{{ url_for('static', filename=p.gallery[0]) }}"
+               alt="{{ p.name }}">
+        </div>
+        {% if p.gallery|length > 1 %}
+        <div class="gallery-thumbs">
+          {% for img in p.gallery %}
+          <button type="button" class="gallery-thumb {% if loop.first %}active{% endif %}"
+                  data-full="{{ url_for('static', filename=img) }}"
+                  data-alt="{{ p.name }}">
+            <img src="{{ url_for('static', filename=img) }}" alt="{{ p.name }}" loading="lazy">
+          </button>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="product-info">
+        <h1>{{ p.name }}</h1>
+        <p class="product-tagline">{{ p.tagline }}</p>
+        <p class="product-desc">{{ p.desc }}</p>
+
+        <div class="spec-grid">
+          {% for label, value in p.specs %}
+          <div class="spec">
+            <span class="spec-label">{{ label }}</span>
+            <span class="spec-value">{{ value }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Paliers de prix -->
+        <div class="tier-mini">
+          <h3>Prix en gros — par pièce</h3>
+          <table class="tier-table">
+            {% for min_qty, price in TIERS_DISPLAY %}
+            <tr class="{% if loop.last %}tier-row-best{% endif %}">
+              <td>{{ min_qty|intdot }} pièces et +</td>
+              <td class="tier-cell-price">{{ price|money }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+          <p class="tier-mini-note">{{ SHIPPING_DELAY }} — {{ WARRANTY }}</p>
+        </div>
+
+        <!-- Achat -->
+        <form method="post" action="{{ url_for('cart_add') }}" class="buy-box js-add-cart">
+          <input type="hidden" name="product" value="{{ pkey }}">
+          <div class="buy-qty">
+            <button type="button" class="qty-btn" data-step="-100" aria-label="Réduire la quantité">−</button>
+            <input class="qty-input" name="qty" value="{{ MIN_QTY }}" inputmode="numeric"
+                   min="{{ MIN_QTY }}" step="100" aria-label="Quantité">
+            <button type="button" class="qty-btn" data-step="100" aria-label="Augmenter la quantité">+</button>
+          </div>
+          <button type="submit" class="btn btn-dark btn-buy">Ajouter au panier</button>
+        </form>
+        <p id="buyMsg" class="buy-msg" role="alert"></p>
+        <p class="product-footnote">
+          Quantité minimale : {{ MIN_QTY|intdot }} pièces. Le prix unitaire
+          s'ajuste automatiquement selon la quantité commandée.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

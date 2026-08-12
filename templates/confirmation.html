@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Commande confirmée — {{ COMPANY }}{% endblock %}
+{% block content %}
+
+<section class="page page-confirm">
+  <div class="container container-narrow">
+    <div class="confirm-head">
+      <span class="confirm-check">✓</span>
+      <h1>Merci, votre commande est confirmée</h1>
+      <p class="confirm-status">Commande n° {{ order.ref }} — {{ payment_label }}</p>
+      <p class="confirm-ship">{{ SHIPPING_DELAY }}</p>
+    </div>
+
+    {% if order.payment_method == 'carte' %}
+    <div class="status-card status-ok">
+      <strong>Statut : {{ order.status }}.</strong>
+      <p class="status-note">Carte se terminant par {{ order.card_last4 }}. Aucun montant n'est débité en ligne :
+        le paiement est effectué à la livraison avec notre terminal portable.</p>
+    </div>
+    {% elif order.payment_method == 'virement' %}
+    <div class="status-card status-wait">
+      <strong>Statut : {{ order.status }}.</strong>
+      {% if bank_details %}
+      <div class="bank-box bank-box-light">
+        <h4>Coordonnées bancaires</h4>
+        <p><strong>Bénéficiaire :</strong> {{ bank_details.beneficiaire }}</p>
+        <p><strong>Banque :</strong> {{ bank_details.banque }}</p>
+        <p><strong>Institution :</strong> {{ bank_details.institution }} ·
+          <strong>Transit :</strong> {{ bank_details.transit }} ·
+          <strong>Compte :</strong> {{ bank_details.compte }}</p>
+        <p class="bank-note">Référence du virement : <strong>{{ order.ref }}</strong>. Votre commande sera
+          expédiée dès réception du virement (vérification sous 24 h).</p>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="status-card status-ok">
+      <strong>Statut : {{ order.status }}.</strong>
+      <p class="status-note">Un conseiller vous contactera pour convenir du moment de la remise.</p>
+    </div>
+    {% endif %}
+
+    <div class="confirm-grid">
+      <div class="confirm-block">
+        <h3>Articles commandés</h3>
+        {% for item in order_items %}
+        <p>{{ item.qty|intdot }} × {{ item.product_name }} — {{ item.price|money }} / pièce</p>
+        {% endfor %}
+        <p class="confirm-sub"><strong>Sous-total :</strong> {{ order.subtotal|money }}</p>
+        <p class="confirm-sub"><strong>Livraison :</strong> incluse</p>
+        <p class="confirm-sub"><strong>Total :</strong> {{ order.total|money }}</p>
+      </div>
+      <div class="confirm-block">
+        <h3>Livraison</h3>
+        <p>{{ order.first_name }} {{ order.last_name }}</p>
+        <p>{{ order.address }}{% if order.apartment %}, {{ order.apartment }}{% endif %}</p>
+        <p>{{ order.city }}, {{ order.province }} {{ order.postal_code }}</p>
+        <p>{{ order.phone }}</p>
+        <p>{{ order.email }}</p>
+      </div>
+    </div>
+
+    <div class="confirm-cta">
+      <p class="confirm-ship">{{ WARRANTY }}</p>
+      <a class="btn btn-dark" href="{{ url_for('index') }}">Retour à l'accueil</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

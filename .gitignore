@@ -1,0 +1,7 @@
+tery_emballage.db
+tery_emballage.db.bak-*
+config.json
+__pycache__/
+*.log
+audit2/
+nohup.out
