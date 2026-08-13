@@ -78,7 +78,7 @@ PRODUCTS = {
             "double pli avec couture simple."
         ),
         "image": "img/sac-blanc.webp",
-        "gallery": ["img/sac-blanc.webp", "img/sac-blanc-pile.webp"],
+        "gallery": ["img/sac-blanc.webp", "img/sac-blanc-2.webp", "img/sac-blanc-pile.webp"],
         "specs": [
             ("Dimensions", "80 × 125 cm"),
             ("Usage", "Construction"),
@@ -97,8 +97,8 @@ PRODUCTS = {
             "on identifie le contenu en un coup d'œil. Haut du sac "
             "coupé à chaud, bas en double pli avec couture simple."
         ),
-        "image": "img/sac-transparent-usage.jpg",
-        "gallery": ["img/sac-transparent-usage.jpg", "img/sac-transparent-2.jpg"],
+        "image": "img/sac-transparent.webp",
+        "gallery": ["img/sac-transparent.webp", "img/sac-transparent-usage.jpg", "img/sac-transparent-2.jpg"],
         "specs": [
             ("Dimensions", "80 × 115 cm"),
             ("Usage", "Chargement de chaussures"),
@@ -118,7 +118,7 @@ PRODUCTS = {
             "stockage et le transport. Poids de la feuille : 95 g."
         ),
         "image": "img/feuille-pp-1.jpg",
-        "gallery": ["img/feuille-pp-1.jpg", "img/feuille-pp-3.jpg"],
+        "gallery": ["img/feuille-pp-1.jpg", "img/feuille-pp-2.jpg", "img/feuille-pp-3.jpg"],
         "specs": [
             ("Dimensions", "105 × 135 cm"),
             ("Usage", "Balles de vêtements (baling clothing)"),
