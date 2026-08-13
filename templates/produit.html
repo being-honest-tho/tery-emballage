@@ -14,7 +14,7 @@
         </div>
         {% if p.gallery|length > 1 %}
         <div class="gallery-thumbs">
-          {% for img in p.gallery %}
+          {% for img in p.gallery[1:] %}
           <button type="button" class="gallery-thumb {% if loop.first %}active{% endif %}"
                   data-full="{{ url_for('static', filename=img) }}"
                   data-alt="{{ p.name }}">
