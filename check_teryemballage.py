@@ -101,9 +101,9 @@ def main():
               page.evaluate("[...document.images].every(i => i.complete && i.naturalWidth > 0)"))
         check("accueil: hero carrousel 3 produits",
               page.locator(".hero-carousel .carousel-slide").count() == 3)
-        check("accueil: cartes = produit + usage (switch)",
+        check("accueil: cartes = 3 images chacune (galerie)",
               page.locator(".product-card .card-carousel").count() == 3
-              and page.locator(".card-carousel .carousel-slide").count() == 6)
+              and page.locator(".card-carousel .carousel-slide").count() == 9)
         check("accueil: pas de débordement horizontal",
               page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"))
         page.screenshot(path=os.path.join(SHOT, "01-accueil.png"))
@@ -112,6 +112,10 @@ def main():
         page.goto(URL + "/produit/sac-blanc", wait_until="domcontentloaded")
         page.wait_for_timeout(1200)
         pbody = norm(page.inner_text("body"))
+        check("produit 1: galerie 3 images (blanc + 2 + pile)",
+              page.locator(".gallery-thumb").count() == 3
+              and page.locator(".gallery-thumb img").nth(1).get_attribute("src").endswith("sac-blanc-2.webp")
+              and page.locator(".gallery-thumb img").nth(2).get_attribute("src").endswith("sac-blanc-pile.webp"))
         check("produit: specs complètes",
               all(x in pbody for x in ["80 × 125 cm", "132 g", "Coupe à chaud (heat cut)",
                                        "Double pli, couture simple (double fold, single stitch)",
@@ -210,9 +214,10 @@ def main():
         page.wait_for_timeout(1000)
         check("produit 2: specs transparent",
               all(x in norm(page.inner_text("body")) for x in ["80 × 115 cm", "108 g", "Chargement de chaussures"]))
-        check("produit 2: galerie 3 images (produit + pile + usage)",
+        check("produit 2: galerie 3 images (transparent + usage + 2)",
               page.locator(".gallery-thumb").count() == 3
-              and page.locator(".gallery-thumb img").nth(2).get_attribute("src").endswith("sac-transparent-usage.jpg"))
+              and page.locator(".gallery-thumb img").nth(1).get_attribute("src").endswith("sac-transparent-usage.jpg")
+              and page.locator(".gallery-thumb img").nth(2).get_attribute("src").endswith("sac-transparent-2.jpg"))
         add_product(page, "sac-transparent", 2000)
         page.goto(URL + "/commande", wait_until="domcontentloaded")
         page.wait_for_timeout(1000)
@@ -231,6 +236,10 @@ def main():
         page.wait_for_timeout(1000)
         check("produit 3: specs feuille",
               all(x in norm(page.inner_text("body")) for x in ["105 × 135 cm", "95 g", "Balles de vêtements", "Laminée"]))
+        check("produit 3: galerie 3 images (feuille 1 + 2 + 3)",
+              page.locator(".gallery-thumb").count() == 3
+              and page.locator(".gallery-thumb img").nth(1).get_attribute("src").endswith("feuille-pp-2.jpg")
+              and page.locator(".gallery-thumb img").nth(2).get_attribute("src").endswith("feuille-pp-3.jpg"))
         add_product(page, "feuille-pp", 2000)
         page.goto(URL + "/commande", wait_until="domcontentloaded")
         page.wait_for_timeout(1000)

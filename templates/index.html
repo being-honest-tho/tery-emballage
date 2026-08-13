@@ -41,10 +41,10 @@
       <article class="product-card">
         <a class="product-card-img" href="{{ url_for('product_page', key=key) }}">
           <div class="carousel card-carousel" data-carousel>
-            <img class="carousel-slide active" src="{{ url_for('static', filename=p.image) }}" alt="{{ p.name }}" loading="lazy">
-            {% if p.usage %}
-            <img class="carousel-slide" src="{{ url_for('static', filename=p.usage) }}" alt="{{ p.name }} — utilisation" loading="lazy">
-            {% endif %}
+            {% for img in p.gallery %}
+            <img class="carousel-slide {% if loop.first %}active{% endif %}" src="{{ url_for('static', filename=img) }}"
+                 alt="{{ p.name }}{% if not loop.first %} — photo {{ loop.index }}{% endif %}" loading="lazy">
+            {% endfor %}
           </div>
         </a>
         <div class="product-card-body">
